@@ -132,7 +132,7 @@ if (typeof window === 'undefined') {
                 });
 
                 // If the registration is active, but it's not controlling the page
-                if (registration.active && !n.serviceWorker.controller) {
+                if (registration.active && (!n.serviceWorker.controller || !window.crossOriginIsolated)) {
                     !coi.quiet && console.log("Reloading page to make use of COOP/COEP Service Worker.");
                     window.sessionStorage.setItem("coiReloadedBySelf", "notcontrolling");
                     coi.doReload();
