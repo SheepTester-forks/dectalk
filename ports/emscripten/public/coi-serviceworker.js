@@ -61,6 +61,7 @@ if (typeof window === 'undefined') {
 } else {
     (() => {
         const reloadedBySelf = window.sessionStorage.getItem("coiReloadedBySelf");
+        console.log('reloadedBySelf', reloadedBySelf)
         window.sessionStorage.removeItem("coiReloadedBySelf");
         const coepDegrading = (reloadedBySelf == "coepdegrade");
 
@@ -77,18 +78,22 @@ if (typeof window === 'undefined') {
 
         const n = navigator;
         const controlling = n.serviceWorker && n.serviceWorker.controller;
+        console.log('controlling', controlling)
+        console.log('crossOriginIsolated', window.crossOriginIsolated)
 
         // Record the failure if the page is served by serviceWorker.
         if (controlling && !window.crossOriginIsolated) {
             window.sessionStorage.setItem("coiCoepHasFailed", "true");
         }
         const coepHasFailed = window.sessionStorage.getItem("coiCoepHasFailed");
+        console.log('coepHasFailed', coepHasFailed)
 
         if (controlling) {
             // Reload only on the first failure.
             const reloadToDegrade = coi.coepDegrade() && !(
                 coepDegrading || window.crossOriginIsolated
             );
+            console.log('reloadToDegrade', reloadToDegrade, reloadToDegrade || coepHasFailed && coi.coepDegrade())
             n.serviceWorker.controller.postMessage({
                 type: "coepCredentialless",
                 value: (reloadToDegrade || coepHasFailed && coi.coepDegrade())
@@ -101,6 +106,7 @@ if (typeof window === 'undefined') {
                 coi.doReload("coepdegrade");
             }
 
+            console.log('shouldDeregister', coi.shouldDeregister())
             if (coi.shouldDeregister()) {
                 n.serviceWorker.controller.postMessage({ type: "deregister" });
             }
@@ -108,6 +114,7 @@ if (typeof window === 'undefined') {
 
         // If we're already coi: do nothing. Perhaps it's due to this script doing its job, or COOP/COEP are
         // already set from the origin server. Also if the browser has no notion of crossOriginIsolated, just give up here.
+        console.log('give up', window.crossOriginIsolated !== false || !coi.shouldRegister())
         if (window.crossOriginIsolated !== false || !coi.shouldRegister()) return;
 
         if (!window.isSecureContext) {
@@ -123,6 +130,7 @@ if (typeof window === 'undefined') {
 
         n.serviceWorker.register(window.document.currentScript.src).then(
             (registration) => {
+                console.log('registered', registration, registration.active, n.serviceWorker.controller, window.crossOriginIsolated)
                 !coi.quiet && console.log("COOP/COEP Service Worker registered", registration.scope);
 
                 registration.addEventListener("updatefound", () => {
