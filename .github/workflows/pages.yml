@@ -47,7 +47,7 @@ jobs:
           cd ports/emscripten
           mkdir dist
           yarn
-          yarn build:all --production
+          yarn build:all -- --production
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
