@@ -24,6 +24,7 @@ const config = {
       },
     }),
   ],
+  sourcemap: true,
   minify: !!argv.production
 };
 
@@ -38,7 +39,7 @@ if (argv.watch) {
     .then((result) => {
       // The result tells us where esbuild's local server is
       const { host, port } = result;
-  
+
       // Then start a proxy server on port 3000
       http
         .createServer((req, res) => {
@@ -58,12 +59,12 @@ if (argv.watch) {
               proxyRes.pipe(res, { end: true });
             }
           );
-  
+
           // Forward the body of the request to esbuild
           req.pipe(proxyReq, { end: true });
         })
         .listen(3000);
-  
+
       console.log("Listening on port 3000")
     });
 } else {
